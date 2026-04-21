@@ -14,6 +14,17 @@
             --text: #111827;
             --text-light: #6B7280;
             --white: #FFFFFF;
+            --overlay-bg: rgba(255, 255, 255, 0.8);
+        }
+        body.dark-mode {
+            --primary: #6366F1;
+            --primary-hover: #818CF8;
+            --bg: #111827;
+            --border: #374151;
+            --text: #F9FAFB;
+            --text-light: #9CA3AF;
+            --white: #1F2937;
+            --overlay-bg: rgba(17, 24, 39, 0.8);
         }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -23,6 +34,10 @@
             padding: 2rem;
             display: flex;
             justify-content: center;
+        }
+        input, textarea {
+            background: var(--white);
+            color: var(--text);
         }
         .container {
             max-width: 1000px;
@@ -117,7 +132,7 @@
         }
         .btn:hover { background: var(--primary-hover); }
         .btn-outline {
-            background: white;
+            background: var(--white);
             color: var(--text);
             border: 1px solid var(--border);
         }
@@ -179,7 +194,7 @@
         .loading-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.8);
+            background: var(--overlay-bg);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -218,9 +233,12 @@
     <div class="header">
         <div class="header-top">
             <h1>AI 키워드 분해 도구</h1>
-            <div class="api-key-container">
-                <label for="api-key">Gemini API Key</label>
-                <input type="password" id="api-key" placeholder="AI-...">
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="btn btn-outline" id="btn-dark-mode" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">🌙 다크 모드</button>
+                <div class="api-key-container">
+                    <label for="api-key">Gemini API Key</label>
+                    <input type="password" id="api-key" placeholder="AI-...">
+                </div>
             </div>
         </div>
         <div class="dict-container">
@@ -273,6 +291,20 @@
     const loading = document.getElementById('loading');
 
     const protectedDictInput = document.getElementById('protected-dict');
+    const btnDarkMode = document.getElementById('btn-dark-mode');
+
+    // Dark Mode Logic
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        btnDarkMode.textContent = '☀️ 라이트 모드';
+    }
+    btnDarkMode.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const darkActive = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', darkActive);
+        btnDarkMode.textContent = darkActive ? '☀️ 라이트 모드' : '🌙 다크 모드';
+    });
 
     // Load API Key & Dict
     apiKeyInput.value = localStorage.getItem('geminiApiKey') || '';
