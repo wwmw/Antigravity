@@ -335,10 +335,16 @@
     });
 
     document.getElementById('btn-copy-output').addEventListener('click', () => {
-        const text = editableText.textContent;
+        // HTML 서식을 제외한 순수 텍스트(Plain text)만 추출, 줄바꿈 등 보존
+        const text = editableText.innerText.replace(/\u00A0/g, ' ');
         if (!text) return alert('복사할 내용이 없습니다.');
-        navigator.clipboard.writeText(text);
-        alert('결과가 복사되었습니다.');
+        
+        navigator.clipboard.writeText(text).then(() => {
+            alert('결과가 순수 텍스트로 복사되었습니다.');
+        }).catch(err => {
+            console.error('클립보드 복사 실패:', err);
+            alert('복사에 실패했습니다.');
+        });
     });
 
     // UI Sync & Caret Preservation Logic
