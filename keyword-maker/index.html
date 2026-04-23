@@ -60,35 +60,34 @@
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
         }
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .settings-panel {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
-        .dict-container {
+        .settings-panel.active {
             display: flex;
-            align-items: center;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .setting-item {
+            display: flex;
+            flex-direction: column;
             gap: 0.5rem;
             font-size: 0.9rem;
+            font-weight: 500;
         }
-        .dict-container input {
-            flex: 1;
+        .setting-item input {
+            width: 100%;
             padding: 0.5rem;
             border: 1px solid var(--border);
             border-radius: 6px;
+            box-sizing: border-box;
         }
-        .api-key-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-        .api-key-container input {
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            width: 250px;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         .main-grid {
             display: flex;
             flex-direction: column;
@@ -231,19 +230,21 @@
 
 <div class="container">
     <div class="header">
-        <div class="header-top">
-            <h1>AI 키워드 분해 도구</h1>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <button class="btn btn-outline" id="btn-dark-mode" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">🌙 다크 모드</button>
-                <div class="api-key-container">
-                    <label for="api-key">Gemini API Key</label>
-                    <input type="password" id="api-key" placeholder="AI-...">
-                </div>
-            </div>
+        <h1>AI 키워드 분해 도구</h1>
+        <div style="display: flex; gap: 10px; justify-content: flex-start;">
+            <button class="btn btn-outline" id="btn-dark-mode" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">🌙 다크 모드</button>
+            <button class="btn btn-outline" id="btn-settings" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">⚙️ 설정</button>
         </div>
-        <div class="dict-container">
-            <label for="protected-dict">분해 방지 단어 사전 (쉼표로 구분)</label>
-            <input type="text" id="protected-dict" placeholder="예: 먼지털이개, 보조배터리, 맥세이프">
+        
+        <div id="settings-panel" class="settings-panel">
+            <div class="setting-item">
+                <label for="api-key">Gemini API Key</label>
+                <input type="password" id="api-key" placeholder="AI-...">
+            </div>
+            <div class="setting-item">
+                <label for="protected-dict">분해 방지 단어 사전 (쉼표로 구분)</label>
+                <input type="text" id="protected-dict" placeholder="예: 먼지털이개, 보조배터리, 맥세이프">
+            </div>
         </div>
     </div>
 
@@ -292,6 +293,8 @@
 
     const protectedDictInput = document.getElementById('protected-dict');
     const btnDarkMode = document.getElementById('btn-dark-mode');
+    const btnSettings = document.getElementById('btn-settings');
+    const settingsPanel = document.getElementById('settings-panel');
 
     // Dark Mode Logic
     const isDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -317,9 +320,16 @@
         localStorage.setItem('protectedDict', protectedDictInput.value);
     });
 
+    // Toggle Settings Panel
+    btnSettings.addEventListener('click', () => {
+        settingsPanel.classList.toggle('active');
+    });
+
     // Toolbar actions
     document.getElementById('btn-remove-empty').addEventListener('click', () => {
-        const lines = inputKeywords.value.split('\n').map(l => l.trim()).filter(Boolean);
+        const lines = inputKeywords.value.split('\n')
+            .map(l => l.replace(/\s+/g, ''))
+            .filter(Boolean);
         inputKeywords.value = [...new Set(lines)].join('\n');
     });
 
